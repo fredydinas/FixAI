@@ -14,26 +14,26 @@ def diagnostico_pc(sintoma):
         "computadora lenta": "Revisa el administrador de tareas y cierra programas innecesarios para mejorar el rendimiento.",
         "se demora en encender": "Podría ser un problema de disco duro o demasiadas aplicaciones en inicio. Prueba deshabilitar programas de inicio innecesarios."
     }
-    
+
     sintoma = sintoma.lower()
     for clave in respuestas.keys():
         if clave in sintoma:
             return respuestas[clave]
-    
-    # Nuevas respuestas mejoradas para detectar más frases similares
-    if "lenta" in sintoma or "computadora lenta" in sintoma or "pc lenta" in sintoma:
-        return "Si tu computadora está lenta, revisa el administrador de tareas, desactiva programas innecesarios y verifica el estado del disco duro."
-    if "enciende" in sintoma or "no prende" in sintoma or "no inicia" in sintoma:
-        return "Si tu computadora no enciende, revisa la conexión de energía, prueba con otro cable y verifica que la fuente de poder funcione correctamente."
-    
+
     return "No tengo información sobre ese problema, pero puedo ayudarte a investigarlo."
 
-@app.route('/diagnostico', methods=['POST'])
+# Ruta raíz para verificar si la API está activa
+@app.route("/", methods=["GET"])
+def home():
+    return "FixAI está funcionando correctamente"
+
+# Ruta para el diagnóstico
+@app.route("/diagnostico", methods=["POST"])
 def diagnostico():
     data = request.get_json()
-    sintoma = data.get("sintoma", "")
+    sintoma = data.get("sintoma", "").lower()
     respuesta = diagnostico_pc(sintoma)
     return jsonify({"respuesta": respuesta})
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
