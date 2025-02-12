@@ -13,15 +13,16 @@ respuestas = {
     "arranque lento": "Podría ser un problema de disco duro o demasiadas aplicaciones en inicio. Prueba deshabilitar programas de inicio innecesarios."
 }
 
-# Función de diagnóstico optimizada
+# Función de diagnóstico optimizada con búsqueda flexible
 def diagnostico_pc(sintoma):
-    sintoma = sintoma.lower()
-    print(f"Procesando síntoma: {sintoma}")  # 👈 Para verificar en los logs qué se recibe
+    sintoma = sintoma.lower().strip()  # Convertir a minúsculas y eliminar espacios
+
+    print(f"Procesando síntoma: {sintoma}")  # Para depuración
 
     # Buscar coincidencias con palabras clave en el diccionario
     for palabra, respuesta in respuestas.items():
-        if palabra in sintoma:
-            print(f"¡Síntoma detectado!: {palabra}")  # 👈 Para depuración
+        if palabra in sintoma:  # Si una palabra clave está en la frase del usuario
+            print(f"¡Síntoma detectado!: {palabra}")  # Para depuración
             return respuesta
 
     return "No tengo información sobre ese problema, pero puedo ayudarte a investigarlo."
@@ -30,9 +31,14 @@ def diagnostico_pc(sintoma):
 @app.route('/diagnostico', methods=['POST'])
 def diagnostico():
     data = request.get_json()
-    print("Datos recibidos:", data)  # 👈 Verifica que se recibe correctamente el JSON
-    sintoma = data.get("sintoma", "").strip()
+    
+    # Validar si el JSON recibido tiene la clave correcta
+    if not data or "sintoma" not in data:
+        return jsonify({"error": "Formato incorrecto. Debes enviar un JSON con la clave 'sintoma'"}), 400
+    
+    sintoma = data.get("sintoma", "").strip()  # Asegurar que no haya espacios en blanco
     respuesta = diagnostico_pc(sintoma)
+    
     return jsonify({"respuesta": respuesta})
 
 # Ruta para verificar si la API está en línea
