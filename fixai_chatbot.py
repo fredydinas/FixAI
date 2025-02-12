@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-import random
 
 app = Flask(__name__)
 
@@ -7,28 +6,23 @@ app = Flask(__name__)
 respuestas = {
     "pantalla azul": "Posibles causas: Fallo de memoria RAM, errores de controladores o problemas en el sistema operativo. Intenta reiniciar en modo seguro y revisar los drivers.",
     "lento": "Si tu PC está lenta, revisa el administrador de tareas y cierra programas innecesarios para mejorar el rendimiento.",
-    "se apaga solo": "Puede ser un problema de temperatura. Limpia los ventiladores y revisa la pasta térmica del procesador.",
-    "no enciende": "Revisa la fuente de poder y prueba con otro cable de corriente. También verifica si el botón de encendido está funcionando.",
-    "no reconoce usb": "Verifica que los controladores USB estén actualizados en el Administrador de dispositivos.",
+    "se apaga": "Puede ser un problema de temperatura. Limpia los ventiladores y revisa la pasta térmica del procesador.",
+    "no enciende": "Revisa la fuente de poder y prueba con otro cable de corriente.",
+    "usb": "Verifica que los controladores USB estén actualizados en el Administrador de dispositivos.",
     "computadora lenta": "Si tu computadora está lenta, revisa el administrador de tareas, desactiva programas innecesarios y verifica el estado del disco duro.",
-    "se demora en encender": "Podría ser un problema de disco duro o demasiadas aplicaciones en inicio. Prueba deshabilitar programas de inicio innecesarios."
+    "arranque lento": "Podría ser un problema de disco duro o demasiadas aplicaciones en inicio. Prueba deshabilitar programas de inicio innecesarios."
 }
 
-# Función de diagnóstico mejorada
+# Función de diagnóstico optimizada
 def diagnostico_pc(sintoma):
     sintoma = sintoma.lower()
+    print(f"Procesando síntoma: {sintoma}")  # 👈 Para verificar en los logs qué se recibe
 
-    # Verificar palabras clave dentro del síntoma
-    for clave in respuestas.keys():
-        if clave in sintoma:
-            return respuestas[clave]
-
-    # Más variaciones de frases comunes
-    if any(kw in sintoma for kw in ["lenta", "computadora lenta", "pc lenta", "va muy despacio"]):
-        return respuestas["computadora lenta"]
-    
-    if any(kw in sintoma for kw in ["no enciende", "no prende", "no inicia"]):
-        return respuestas["no enciende"]
+    # Buscar coincidencias con palabras clave en el diccionario
+    for palabra, respuesta in respuestas.items():
+        if palabra in sintoma:
+            print(f"¡Síntoma detectado!: {palabra}")  # 👈 Para depuración
+            return respuesta
 
     return "No tengo información sobre ese problema, pero puedo ayudarte a investigarlo."
 
@@ -36,6 +30,7 @@ def diagnostico_pc(sintoma):
 @app.route('/diagnostico', methods=['POST'])
 def diagnostico():
     data = request.get_json()
+    print("Datos recibidos:", data)  # 👈 Verifica que se recibe correctamente el JSON
     sintoma = data.get("sintoma", "").strip()
     respuesta = diagnostico_pc(sintoma)
     return jsonify({"respuesta": respuesta})
@@ -46,5 +41,5 @@ def home():
     return "FixAI está funcionando correctamente"
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
